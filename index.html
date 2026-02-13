@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Happy Birthday ❤️</title>
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#141a33;
+      --card:#0f1730cc;
+      --text:#f3f6ff;
+      --muted:#b9c2ff;
+      --accent:#ff4d8d;
+      --accent2:#7c5cff;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --radius: 22px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      min-height:100vh;
+      overflow-x:hidden;
+      background: radial-gradient(1200px 800px at 10% 10%, #1b2a64 0%, transparent 50%),
+                  radial-gradient(900px 700px at 90% 10%, #6d1b4c 0%, transparent 55%),
+                  linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    /* floating hearts canvas layer */
+    canvas#fx{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:0;
+      pointer-events:none;
+      opacity:.8;
+    }
+
+    .wrap{
+      position:relative;
+      z-index:1;
+      max-width:980px;
+      margin:0 auto;
+      padding:28px 18px 70px;
+    }
+
+    header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-top:10px;
+    }
+
+    .badge{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      background: rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      padding:10px 14px;
+      border-radius:999px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      font-size:14px;
+      color:var(--muted);
+    }
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow:0 0 20px rgba(255,77,141,.6);
+    }
+
+    h1{
+      margin:12px 0 6px;
+      font-size: clamp(34px, 4vw, 54px);
+      line-height:1.02;
+      letter-spacing:-0.02em;
+    }
+    .sub{
+      margin:0;
+      color:var(--muted);
+      font-size: clamp(14px, 2vw, 18px);
+      max-width:60ch;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:16px;
+      margin-top:18px;
+    }
+    @media (max-width:900px){
+      .grid{grid-template-columns:1fr}
+      header{flex-direction:column}
+    }
+
+    .card{
+      background: var(--card);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:18px;
+      backdrop-filter: blur(10px);
+    }
+
+    .tabs{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    button{
+      border:0;
+      cursor:pointer;
+      color:var(--text);
+      padding:12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      font-weight:600;
+      letter-spacing:.2px;
+    }
+    button:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.3); }
+    button.primary{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-color: transparent;
+      box-shadow: 0 12px 30px rgba(255,77,141,.25);
+    }
+
+    .sceneTitle{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+    }
+    .sceneTitle h2{
+      margin:0;
+      font-size:20px;
+      letter-spacing:-.01em;
+    }
+    .pill{
+      font-size:12px;
+      color:var(--muted);
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      white-space:nowrap;
+    }
+
+    .scene{
+      display:none;
+      animation: pop .22s ease;
+    }
+    .scene.active{ display:block; }
+    @keyframes pop{
+      from{ transform: translateY(6px); opacity:.35; }
+      to{ transform: translateY(0); opacity:1; }
+    }
+
+    .bigMsg{
+      font-size: clamp(18px, 2.1vw, 22px);
+      line-height:1.55;
+      margin:10px 0 0;
+      color:#f7f8ff;
+    }
+    .muted{ color:var(--muted); }
+
+    .reveal{
+      margin-top:14px;
+      padding:14px;
+      border-radius:16px;
+      background: rgba(255,255,255,.06);
+      border:1px dashed rgba(255,255,255,.22);
+    }
+    .hidden{ display:none; }
+
+    .gallery{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+      margin-top:10px;
+    }
+    @media (max-width:700px){ .gallery{grid-template-columns: repeat(2, 1fr);} }
+    .photo{
+      aspect-ratio: 1 / 1;
+      border-radius:16px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      overflow:hidden;
+      position:relative;
+      transform: translateZ(0);
+    }
+    .photo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      transition: transform .25s ease;
+    }
+    .photo:hover img{ transform: scale(1.04); }
+
+    .mini{
+      font-size:13px;
+      color:var(--muted);
+      margin-top:6px;
+    }
+
+    footer{
+      margin-top:18px;
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    /* confetti */
+    .confetti{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:5;
+      overflow:hidden;
+    }
+    .confetti span{
+      position:absolute;
+      top:-10px;
+      width:10px;height:14px;
+      border-radius:3px;
+      opacity:.9;
+      animation: fall 1.2s linear forwards;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      transform: rotate(12deg);
+    }
+    @keyframes fall{
+      to{ transform: translateY(110vh) rotate(260deg); opacity:0.95;}
+    }
+  </style>
+</head>
+
+<body>
+<canvas id="fx"></canvas>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="badge"><span class="dot"></span> Birthday Mode: ON</div>
+      <h1>Happy Birthday, <span id="name">My Love</span> ❤️</h1>
+      <p class="sub">I made you a tiny interactive world. Click around. There are secrets. There is chaos. There is love.</p>
+      <div class="tabs">
+        <button class="primary" data-scene="scene1">Start Here</button>
+        <button data-scene="scene2">Why I Love You</button>
+        <button data-scene="scene3">Memory Vault</button>
+        <button data-scene="scene4">Photos</button>
+      </div>
+    </div>
+
+    <div class="card" style="min-width:260px">
+      <div class="sceneTitle">
+        <h2>Quick Surprise</h2>
+        <span class="pill">Tap tap tap</span>
+      </div>
+      <p class="muted" style="margin:0 0 10px">Press the button for a little celebration.</p>
+      <button id="celebrate" class="primary" style="width:100%">🎉 Celebrate</button>
+      <p class="mini">Tip: edit the messages in the code to make it super personal.</p>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="card">
+      <div class="scene active" id="scene1">
+        <div class="sceneTitle">
+          <h2>Welcome</h2>
+          <span class="pill">Scene 1</span>
+        </div>
+        <p class="bigMsg">
+          Hey <b id="nickname">babe</b> — I wanted your birthday message to feel like an experience, not just a text.
+          So here’s a little world made with love.
+        </p>
+        <div class="reveal">
+          <p class="muted" style="margin:0 0 10px">Click to reveal the first secret:</p>
+          <button id="reveal1">Reveal Secret #1</button>
+          <div id="secret1" class="hidden">
+            <p class="bigMsg" style="margin-top:12px">
+              You make ordinary days feel like home. I’m so grateful for you. ❤️
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="scene" id="scene2">
+        <div class="sceneTitle">
+          <h2>Why I Love You</h2>
+          <span class="pill">Scene 2</span>
+        </div>
+        <p class="bigMsg">Here are a few reasons (and I could write 200 more):</p>
+        <ul class="bigMsg" style="margin-top:10px">
+          <li><b>Your energy</b> — you lift a room without trying.</li>
+          <li><b>Your heart</b> — you care deeply, even when no one sees it.</li>
+          <li><b>Your mind</b> — you’re smart, curious, and always growing.</li>
+          <li><b>You + me</b> — we just work.</li>
+        </ul>
+        <div class="reveal">
+          <p class="muted" style="margin:0 0 10px">Want a custom compliment spinner?</p>
+          <button id="complimentBtn" class="primary">Give me one</button>
+          <p id="complimentOut" class="bigMsg" style="margin:12px 0 0"></p>
+        </div>
+      </div>
+
+      <div class="scene" id="scene3">
+        <div class="sceneTitle">
+          <h2>Memory Vault</h2>
+          <span class="pill">Scene 3</span>
+        </div>
+        <p class="bigMsg">Pick a vault door:</p>
+        <div class="tabs">
+          <button data-vault="0">🗝️ Door 1</button>
+          <button data-vault="1">🗝️ Door 2</button>
+          <button data-vault="2">🗝️ Door 3</button>
+        </div>
+        <div class="reveal">
+          <p class="muted" style="margin:0 0 8px">Vault message:</p>
+          <p id="vaultMsg" class="bigMsg" style="margin:0">Choose a door above 👆</p>
+        </div>
+      </div>
+
+      <div class="scene" id="scene4">
+        <div class="sceneTitle">
+          <h2>Photos</h2>
+          <span class="pill">Scene 4</span>
+        </div>
+        <p class="muted" style="margin-top:0">
+          Add your images into a folder named <b>photos</b> next to this HTML file, then update the filenames below.
+        </p>
+        <div class="gallery" id="gallery">
+          <!-- Replace with your real photo filenames -->
+          <div class="photo"><img src="photos/photo1.jpg" alt="photo 1"></div>
+          <div class="photo"><img src="photos/photo2.jpg" alt="photo 2"></div>
+          <div class="photo"><img src="photos/photo3.jpg" alt="photo 3"></div>
+          <div class="photo"><img src="photos/photo4.jpg" alt="photo 4"></div>
+          <div class="photo"><img src="photos/photo5.jpg" alt="photo 5"></div>
+          <div class="photo"><img src="photos/photo6.jpg" alt="photo 6"></div>
+        </div>
+        <p class="mini">If photos don’t load yet, it’s okay—add them later and redeploy.</p>
+      </div>
+    </section>
+
+    <aside class="card">
+      <div class="sceneTitle">
+        <h2>One Last Button</h2>
+        <span class="pill">Teleport</span>
+      </div>
+      <p class="muted" style="margin-top:0">
+        This button can take him to a new page (a letter, a playlist, a surprise location, anything).
+      </p>
+      <button id="teleport" class="primary" style="width:100%">🚀 Take me somewhere</button>
+      <div class="reveal" style="margin-top:14px">
+        <p class="muted" style="margin:0 0 8px">What it does now:</p>
+        <p class="mini" style="margin:0">Opens a cute hidden “letter” in a new tab.</p>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    Made with love + a little code ✨
+  </footer>
+</div>
+
+<div class="confetti" id="confetti"></div>
+
+<script>
+  // ---- Personalize quickly here ----
+  const BOYFRIEND_NAME = "My Love"; // change this
+  const NICKNAME = "babe";          // change this
+
+  document.getElementById("name").textContent = BOYFRIEND_NAME;
+  document.getElementById("nickname").textContent = NICKNAME;
+
+  // ---- Scenes (tabs) ----
+  const sceneButtons = document.querySelectorAll("button[data-scene]");
+  const scenes = document.querySelectorAll(".scene");
+  sceneButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.scene;
+      scenes.forEach(s => s.classList.toggle("active", s.id === id));
+    });
+  });
+
+  // ---- Reveal secret #1 ----
+  document.getElementById("reveal1").addEventListener("click", () => {
+    document.getElementById("secret1").classList.toggle("hidden");
+  });
+
+  // ---- Compliment generator ----
+  const compliments = [
+    "You have this calm strength that makes me feel safe.",
+    "You’re ridiculously handsome. It’s unfair, actually.",
+    "The way you love people is rare — never change.",
+    "You make me laugh when I didn’t even know I needed it.",
+    "You’re my favorite person to do nothing with."
+  ];
+  document.getElementById("complimentBtn").addEventListener("click", () => {
+    const pick = compliments[Math.floor(Math.random() * compliments.length)];
+    document.getElementById("complimentOut").textContent = pick;
+  });
+
+  // ---- Memory Vault ----
+  const vaultMsgs = [
+    "Door 1: I love the way you look at me like I’m your whole world.",
+    "Door 2: I’m proud of you — for who you are, and who you’re becoming.",
+    "Door 3: This year I want more adventures, more laughs, more us."
+  ];
+  document.querySelectorAll("button[data-vault]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const i = Number(btn.dataset.vault);
+      document.getElementById("vaultMsg").textContent = vaultMsgs[i] || "✨";
+    });
+  });
+
+  // ---- Teleport button (opens a letter in a new tab) ----
+  document.getElementById("teleport").addEventListener("click", () => {
+    const html = `
+      <html><head><meta charset="utf-8"><title>A Letter</title>
+      <style>
+        body{font-family:system-ui;display:grid;place-items:center;min-height:100vh;margin:0;
+        background:linear-gradient(135deg,#0b1020,#2b1247);color:#fff}
+        .card{max-width:720px;margin:24px;padding:22px;border-radius:20px;
+        background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
+        h1{margin:0 0 10px}
+        p{line-height:1.6;font-size:18px;color:#f1f1ff}
+        .small{opacity:.85;font-size:14px}
+      </style></head>
+      <body><div class="card">
+        <h1>Hey ${BOYFRIEND_NAME} ❤️</h1>
+        <p>
+          I just want you to know: I’m choosing you, again and again.
+          Happy birthday my love. You deserve the softest joy.
+        </p>
+        <p class="small">— from me</p>
+      </div></body></html>
+    `;
+    const blob = new Blob([html], {type:"text/html"});
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+  });
+
+  // ---- Confetti ----
+  function launchConfetti(){
+    const holder = document.getElementById("confetti");
+    holder.innerHTML = "";
+    const pieces = 80;
+    for(let i=0;i<pieces;i++){
+      const s = document.createElement("span");
+      s.style.left = Math.random()*100 + "vw";
+      s.style.animationDelay = (Math.random()*0.25) + "s";
+      s.style.transform = `rotate(${Math.random()*90}deg)`;
+      s.style.width = (6 + Math.random()*10) + "px";
+      s.style.height = (10 + Math.random()*14) + "px";
+      holder.appendChild(s);
+    }
+    setTimeout(()=> holder.innerHTML="", 1500);
+  }
+  document.getElementById("celebrate").addEventListener("click", launchConfetti);
+
+  // ---- Floating hearts background ----
+  const canvas = document.getElementById("fx");
+  const ctx = canvas.getContext("2d");
+  let W, H, hearts = [];
+
+  function resize(){
+    W = canvas.width = window.innerWidth * devicePixelRatio;
+    H = canvas.height = window.innerHeight * devicePixelRatio;
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = window.innerHeight + "px";
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function makeHeart(){
+    return {
+      x: Math.random()*W,
+      y: H + Math.random()*H*0.4,
+      r: (6 + Math.random()*10) * devicePixelRatio,
+      vy: (0.35 + Math.random()*0.9) * devicePixelRatio,
+      vx: (-0.25 + Math.random()*0.5) * devicePixelRatio,
+      a: 0.35 + Math.random()*0.45
+    };
+  }
+
+  for(let i=0;i<70;i++) hearts.push(makeHeart());
+
+  function drawHeart(x,y,r,alpha){
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(x,y);
+    ctx.beginPath();
+    const s = r/16;
+    ctx.moveTo(0, -6*s);
+    ctx.bezierCurveTo(8*s,-14*s, 16*s,-2*s, 0, 12*s);
+    ctx.bezierCurveTo(-16*s,-2*s, -8*s,-14*s, 0,-6*s);
+    ctx.closePath();
+    const grad = ctx.createLinearGradient(-r, -r, r, r);
+    grad.addColorStop(0, "#ff4d8d");
+    grad.addColorStop(1, "#7c5cff");
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    for(const h of hearts){
+      h.x += h.vx;
+      h.y -= h.vy;
+      if(h.y < -50*devicePixelRatio) {
+        h.x = Math.random()*W;
+        h.y = H + Math.random()*H*0.3;
+      }
+      if(h.x < -50*devicePixelRatio) h.x = W + 50*devicePixelRatio;
+      if(h.x > W + 50*devicePixelRatio) h.x = -50*devicePixelRatio;
+      drawHeart(h.x,h.y,h.r,h.a);
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+</script>
+</body>
+</html>
