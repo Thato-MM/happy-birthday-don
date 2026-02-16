@@ -58,7 +58,7 @@
 
  
 
-  .popupBg{
+.popupBg{
   position:absolute;
   inset:0;
   z-index:0;
@@ -66,14 +66,22 @@
     linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.25)),
     url("photos/hero.jpeg");
 
-   background-repeat: no-repeat;
-  background-size: cover;            /* ✅ prevents “small image” on mobile */
-  background-position: center 65%;  /* moves image DOWN */
   background-repeat: no-repeat;
 
-filter: blur(0px) saturate(1.12);
+  /* DESKTOP defaults */
+  background-size: 95%;            /* zoom out slightly */
+  background-position: center 72%; /* move image down a bit */
+
+  filter: blur(0px) saturate(1.12);
   opacity: 1;
 }
+@media (max-width: 768px){
+  .popupBg{
+    background-size: cover;          /* fill screen on mobile */
+    background-position: center 65%; /* mobile framing */
+  }
+}
+
 
 
 
@@ -546,5 +554,6 @@ I can’t wait to celebrate your birthday in Cape Town. Just tell me the destina
   </script>
 </body>
 </html>
+
 
 
